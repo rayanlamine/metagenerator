@@ -136,7 +136,13 @@ class DodoPaymentsService:
                 }
             
             # Create payment with Dodo Payments
-            response = self.client.payments.create(**payment_data)
+            print(f"Attempting to create payment with Dodo Payments API. API Key: {self.api_key[:5]}...")
+            try:
+                response = self.client.payments.create(**payment_data)
+                print(f"Successfully created payment with Dodo Payments API: {response.id}")
+            except Exception as api_error:
+                print(f"Error calling Dodo Payments API: {str(api_error)}")
+                raise
             
             # Save payment record to database
             if self.payments_collection:
