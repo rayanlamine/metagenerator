@@ -38,14 +38,29 @@ class DodoPaymentsService:
         self.api_key = os.getenv("DODO_PAYMENTS_API_KEY")
         self.webhook_secret = os.getenv("DODO_PAYMENTS_WEBHOOK_SECRET")
         self.mode = os.getenv("DODO_PAYMENTS_MODE", "test")
+        api_url = os.getenv("DODO_PAYMENTS_API_URL")
         
         if not self.api_key:
             raise ValueError("DODO_PAYMENTS_API_KEY environment variable is required")
         
-        # Initialize Dodo Payments client
-        self.client = DodoPayments(
-            bearer_token=self.api_key,
-        )
+        # Initialize Dodo Payments client with proper environment configuration
+        client_kwargs = {
+            "bearer_token": self.api_key,
+        }
+        
+        # Set environment based on mode
+        if self.mode == "test":
+            client_kwargs["environment"] = "test_mode"
+        else:
+            client_kwargs["environment"] = "live_mode"
+            
+        # Set custom base URL if provided
+        if api_url:
+            client_kwargs["base_url"] = api_url
+            
+        logger.info(f"Initializing Dodo Payments client in {self.mode} mode with environment: {client_kwargs.get('environment')}")
+        
+        self.client = DodoPayments(**client_kwargs)
         
         # Database collections
         self.payments_collection = db_collections.get("payments")
