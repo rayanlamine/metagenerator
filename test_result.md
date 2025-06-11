@@ -199,15 +199,18 @@ Clone the metageneratorai repository (https://github.com/pixel-1127/metagenerato
 
   - task: "Test payment functionality"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/DodoPaymentTest.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Payment test interface ready with health checks, payment forms, subscription testing, and test card information. Ready for comprehensive testing."
+        - working: false
+          agent: "testing"
+          comment: "Payment functionality is not working correctly. The backend is returning mock payment responses instead of real Dodo Payments API responses. All payment operations (simple payment, test endpoint, subscription) return mock IDs like 'mock_payment_1749661799'. The checkout URL redirects to a non-existent page at 'https://checkout.dodopayments.com/mock/mock_payment_1749661799'. The issue is in the DodoPaymentsService class where there's a fallback mechanism that returns mock responses when in test mode if the API call fails. The health check shows the API key is configured, but the actual API calls are failing."
 
 ## metadata:
   created_by: "main_agent"
