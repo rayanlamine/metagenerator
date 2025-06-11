@@ -223,11 +223,11 @@ Clone the metageneratorai repository (https://github.com/pixel-1127/metagenerato
 
 ## test_plan:
   current_focus:
-    - "Test backend payment endpoints"
-    - "Test frontend payment interface"
-    - "Verify health status"
+    - "Fix Dodo Payments API integration"
+    - "Debug API call failures"
     - "Test payment creation and processing"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Test payment functionality"
   test_all: false
   test_priority: "high_first"
 
