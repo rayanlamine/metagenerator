@@ -7,57 +7,20 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, Any
 from datetime import datetime
-
-# Debug information
-print("Python path in dodo_payments.py:", sys.path)
-print("Current directory in dodo_payments.py:", os.getcwd())
-
-try:
-    import dodopayments
-    from dodopayments import DodoPayments
-    print("Successfully imported dodopayments in dodo_payments.py:", dodopayments.__file__)
-except ImportError as e:
-    print("Failed to import dodopayments in dodo_payments.py:", str(e))
-    # Fallback to mock implementation
-    class DodoPayments:
-        def __init__(self, bearer_token=None):
-            self.payments = MockPayments()
-            self.subscriptions = MockSubscriptions()
-            
-    class MockPayments:
-        def create(self, **kwargs):
-            from datetime import datetime
-            mock_id = f"mock_payment_{int(datetime.utcnow().timestamp())}"
-            return MockResponse(
-                id=mock_id,
-                url=f"https://checkout.dodopayments.com/mock/{mock_id}",
-                status="pending",
-                expires_at=datetime.utcnow().isoformat()
-            )
-            
-    class MockSubscriptions:
-        def create(self, **kwargs):
-            from datetime import datetime
-            mock_id = f"mock_subscription_{int(datetime.utcnow().timestamp())}"
-            return MockSubscriptionResponse(
-                subscription_id=mock_id,
-                customer_id=kwargs.get("customer", {}).get("customer_id", "unknown"),
-                status="active",
-                product_id=kwargs.get("product_id", "unknown"),
-                payment_url=f"https://checkout.dodopayments.com/mock/{mock_id}"
-            )
-            
-    class MockResponse:
-        def __init__(self, **kwargs):
-            for key, value in kwargs.items():
-                setattr(self, key, value)
-                
-    class MockSubscriptionResponse:
-        def __init__(self, **kwargs):
-            for key, value in kwargs.items():
-                setattr(self, key, value)
-
+import dodopayments
+from dodopayments import DodoPayments
 from motor.motor_asyncio import AsyncIOMotorCollection
+
+# Add the current directory to the Python path
+sys.path.append(str(Path(__file__).parent.parent))
+
+from models.payment import (
+    CreatePaymentRequest, PaymentResponse, CreateSubscriptionRequest, 
+    SubscriptionResponse, PaymentRecord, SubscriptionRecord, PaymentStatus,
+    SubscriptionStatus
+)
+
+logger = logging.getLogger(__name__)
 
 # Add the current directory to the Python path
 sys.path.append(str(Path(__file__).parent.parent))
