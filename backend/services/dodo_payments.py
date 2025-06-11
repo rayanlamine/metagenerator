@@ -113,13 +113,16 @@ class DodoPaymentsService:
                     "zipcode": payment_request.billing.zipcode
                 }
             
+            # Log the attempt
+            logger.info(f"Creating payment with Dodo Payments API in {self.mode} mode")
+            logger.info(f"Payment data: {payment_data}")
+            
             # Create payment with Dodo Payments
-            print(f"Attempting to create payment with Dodo Payments API. API Key: {self.api_key[:5]}...")
             try:
                 response = self.client.payments.create(**payment_data)
-                print(f"Successfully created payment with Dodo Payments API: {response.id}")
+                logger.info(f"Successfully created payment with Dodo Payments API: {response.id}")
             except Exception as api_error:
-                print(f"Error calling Dodo Payments API: {str(api_error)}")
+                logger.error(f"Error calling Dodo Payments API: {str(api_error)}")
                 raise
             
             # Save payment record to database
@@ -150,8 +153,12 @@ class DodoPaymentsService:
             
         except Exception as e:
             logger.error(f"Error creating payment: {str(e)}")
-            # In test mode, return a mock response if API fails
+            logger.error(f"Error type: {type(e)}")
+            logger.error(f"Error details: {repr(e)}")
+            
+            # In test mode, return a mock response if API fails - but log the actual error
             if self.mode == "test":
+                logger.warning("API call failed in test mode, returning mock response for debugging")
                 mock_id = f"mock_payment_{int(datetime.utcnow().timestamp())}"
                 return PaymentResponse(
                     id=mock_id,
